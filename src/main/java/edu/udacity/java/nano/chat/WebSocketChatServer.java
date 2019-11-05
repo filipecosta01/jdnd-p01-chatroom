@@ -43,7 +43,6 @@ public class WebSocketChatServer {
     public void onOpen(Session session) {
         onlineSessions.put(session.getId(), session);
         final Message connectedMessage = new Message(onlineSessions.size());
-        connectedMessage.setType("ENTER");
         sendMessageToAll(connectedMessage.getJSONMessageToString());
 
     }
@@ -55,6 +54,7 @@ public class WebSocketChatServer {
     public void onMessage(Session session, String jsonStr) {
         try {
             final Message userMessage = new Message(jsonStr);
+            session.getUserProperties().put("username", userMessage.getUsername());
             sendMessageToAll(userMessage.getJSONMessageToString());
         } catch(JSONException jex) {
             System.err.println(jex.getMessage());
@@ -66,9 +66,11 @@ public class WebSocketChatServer {
      */
     @OnClose
     public void onClose(Session session) {
+        final String username = (String) session.getUserProperties().get("username");
         onlineSessions.remove(session.getId(), session);
         final Message disconnectedMessage = new Message(onlineSessions.size());
         disconnectedMessage.setType("LEAVE");
+        disconnectedMessage.setMsg(username + " left the chat");
         sendMessageToAll(disconnectedMessage.getJSONMessageToString());
     }
 

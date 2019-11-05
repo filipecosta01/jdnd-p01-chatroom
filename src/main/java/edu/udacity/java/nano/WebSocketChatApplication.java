@@ -32,6 +32,7 @@ public class WebSocketChatApplication {
     public ModelAndView index(String username, HttpServletRequest request) throws UnknownHostException {
         final ModelAndView chatModelAndView = new ModelAndView("chat");
         chatModelAndView.addObject("username", username);
+        request.getSession().setAttribute("username", username);
         return chatModelAndView;
     }
 }

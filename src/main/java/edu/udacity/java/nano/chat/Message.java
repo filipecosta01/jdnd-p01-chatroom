@@ -20,9 +20,16 @@ public class Message {
 
     public Message (final String jsonAsString) throws JSONException {
         JSONObject messageAsJson = JSONObject.parseObject(jsonAsString);
-        this.type = "SPEAK";
-        this.msg = messageAsJson.getString("msg");
+        final String messageType = messageAsJson.getString("type");
         this.username = messageAsJson.getString("username");
+        // When logging in, we send a message with type "ENTER" to make sure we broadcast when user logs in
+        if (messageType != null) {
+            this.type = messageType;
+            this.msg = this.username +  " joined the chat";
+        } else {
+            this.msg = messageAsJson.getString("msg");
+            this.type = "SPEAK";
+        }
     }
 
     public Integer getOnlineCount() {
@@ -60,9 +67,9 @@ public class Message {
     public String getJSONMessageToString() {
         final JSONObject messageAsJson = new JSONObject();
         if (this.type != null && this.type.equals("SPEAK")) {
-            messageAsJson.put("type", this.type);
             messageAsJson.put("username", this.username);
         }
+        messageAsJson.put("type", this.type);
         messageAsJson.put("msg", this.msg);
         messageAsJson.put("onlineCount", this.onlineCount);
         return messageAsJson.toJSONString();

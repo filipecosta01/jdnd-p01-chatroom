@@ -85,6 +85,8 @@
          */
         webSocket.onopen = function (event) {
             console.log('WebSocket open connection');
+            var username = $('#username').text();
+            webSocket.send(JSON.stringify({username: $('#username').text(), type: "ENTER"}));
         };
 
         /**
@@ -95,11 +97,19 @@
             //Receive Message from Server
             var message = JSON.parse(event.data) || {};
             var $messageContainer = $('.message-container');
+            var username = $('#username').text();
             if (message.type === 'SPEAK') {
                 $messageContainer.append(
                     '<div class="mdui-card" style="margin: 10px 0;">' +
                     '<div class="mdui-card-primary">' +
                     '<div class="mdui-card-content message-content">' + message.username + "：" + message.msg + '</div>' +
+                    '</div></div>');
+            }
+            if (message.type === 'ENTER' || message.type === 'LEAVE') {
+                $messageContainer.append(
+                    '<div class="mdui-card" style="margin: 10px 0;">' +
+                    '<div class="mdui-card-primary">' +
+                    '<div class="mdui-card-content message-content">' + message.msg + '</div>' +
                     '</div></div>');
             }
             $('.chat-num').text(message.onlineCount);
